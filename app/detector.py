@@ -4,7 +4,7 @@ import cv2
 VEHICLE_CLASSES = ["car", "bus", "truck", "motorcycle"]
 
 class VehicleDetector:
-    def __init__(self, model_path="yolov8n.pt"):
+    def __init__(self, model_path="yolov11n.pt"):
         self.model = YOLO(model_path)
 
     def detect(self, frame):
