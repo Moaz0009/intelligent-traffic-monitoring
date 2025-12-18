@@ -1,34 +1,34 @@
 import cv2
-from detector import VehicleDetector
+from tracker import VehicleTracker
+from google.colab.patches import cv2_imshow
 
-VIDEO_PATH = "data/Vehicle Dataset Sample 3.mp4"
+# Paths from your setup
+VIDEO_PATH = "/content/drive/MyDrive/intelligent-traffic-monitoring/Data/Vehicle Dataset Sample 3.mp4"
 
-detector = VehicleDetector()
+def main():
+    tracker = VehicleTracker()
+    cap = cv2.VideoCapture(VIDEO_PATH)
 
-cap = cv2.VideoCapture(VIDEO_PATH)
+    while cap.isOpened():
+        success, frame = cap.read()
+        if not success:
+            break
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+        # Get tracking results
+        tracked_frame_data = tracker.track(frame)
+        
+        # Visualize the tracking (boxes + IDs)
+        annotated_frame = tracked_frame_data.plot()
 
-    detections = detector.detect(frame)
+        # Display (Only every 5th frame to save Colab memory if needed)
+        cv2_imshow(annotated_frame)
+        
+        # Break for testing (Phase 2 confirmation)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-    for x1, y1, x2, y2, cls, conf in detections:
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-        cv2.putText(
-            frame,
-            f"{cls} {conf:.2f}",
-            (x1, y1 - 5),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            (0, 255, 0),
-            2
-        )
+    cap.release()
+    cv2.destroyAllWindows()
 
-    cv2.imshow("Vehicle Detection", frame)
-    if cv2.waitKey(1) & 0xFF == 27:
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()
